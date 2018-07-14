@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+/*
+ * This is just to slop up some initial solutions and desperately needs tests and modularization
+ */
 public class Dictionary {
 
 	Map<String, Integer> dictionary = new HashMap<String, Integer>();
@@ -23,8 +26,8 @@ public class Dictionary {
 	public static void main(String[] args) {
 		new Dictionary(args);
 	}
-	
-	public Dictionary(String ...args) {
+
+	public Dictionary(String... args) {
 		List<String> argList = Arrays.asList(args);
 		if (argList.contains("-f")) {
 			String file = argList.get(argList.indexOf("-f") + 1);
@@ -169,44 +172,50 @@ public class Dictionary {
 		}
 	}
 
-	public void longestPrefix() {
-
-	}
-
-	public void translation() {
-
+	public String translation(String filename, String translationFile) throws IOException {
+		List<String> fileLines = Files.readAllLines(Paths.get(filename));
+		Map<String, String> translationList = new HashMap<String, String>();
+		Files.readAllLines(Paths.get(translationFile)).forEach(line -> {
+			translationList.put(line.split(delimiter)[0], line.split(delimiter)[1]);
+		});
+		String fileText = String.join(System.lineSeparator(), fileLines);
+		String translation = fileText;
+		translationList.forEach((curr, tran) -> {
+			translation.replaceAll(curr, tran);
+		});
+		return translation;
 	}
 
 	public List<Point> ottendordCipher(String phrase, String fileText) {
 		List<Point> coordinates = new ArrayList<Point>();
 		try {
 			List<String> list = Files.readAllLines(Paths.get("input.txt"));
-			for(String letter : phrase.split("")) {
+			for (String letter : phrase.split("")) {
 				int index = 0;
 				List<String> listWithLetter = new ArrayList<String>();
-				while(index < list.size() && list.get(index).contains(letter)) {
+				while (index < list.size() && list.get(index).contains(letter)) {
 					listWithLetter.add(list.get(index));
 					index++;
 				}
-				if(listWithLetter.size() > 0) {
-					String line = listWithLetter.get((int)(Math.random() * listWithLetter.size()));
+				if (listWithLetter.size() > 0) {
+					String line = listWithLetter.get((int) (Math.random() * listWithLetter.size()));
 					List<Integer> dexes = new ArrayList<Integer>();
 					int dex = line.indexOf(letter);
-					while(dex >= 0) {
+					while (dex >= 0) {
 						dexes.add(dex);
 						dex = line.indexOf(letter, dex + 1);
 					}
-					int column = dexes.get((int)(Math.random() * dexes.size()));
+					int column = dexes.get((int) (Math.random() * dexes.size()));
 					int row = list.indexOf(line);
 					coordinates.add(new Point(row, column));
-				}else {
+				} else {
 					System.out.println("No lines contain the letter " + letter);
 					return coordinates;
 				}
 			}
-			if(coordinates.size() == phrase.split("").length) {
+			if (coordinates.size() == phrase.split("").length) {
 				return coordinates;
-			}else {
+			} else {
 				System.out.println("Cipher could not be made");
 				return coordinates;
 			}
